@@ -20,6 +20,7 @@ const expensesList = document.querySelector('#expensesList');
 const btnReset = document.querySelector('.btn-reset');
 const btnFilter = document.querySelectorAll('.filter-btn');
 const btnDelete = document.querySelectorAll('.btn-delete');
+const emptyData = document.querySelector('.empty-state');
 // Setting deafault value
 totalBudgetEl.textContent = '₹' + totalBudget;
 headerDate.textContent = new Date().toLocaleDateString('en-IN', {
@@ -61,9 +62,11 @@ document.addEventListener('DOMContentLoaded', function () {
       totalSpent += +data.inputAmount;
       budgetLeft -= +data.inputAmount;
     });
+    emptyData.style.opacity = 0;
+
     updateHTMLel(savedData);
     updateUI();
-  }
+  } else emptyData.style.opacity = 1;
   const today = new Date();
 
   // Format as yyyy-mm-dd (required for input[type="date"])
@@ -89,11 +92,17 @@ btnExpense.addEventListener('submit', function (e) {
     updateUI();
     localStorage.setItem('data', JSON.stringify(savedData));
     inputAmount.value = inputCategory.value = inputDescription.value = '';
+    emptyData.style.opacity = 0;
   } else alert(`You don't have enough budget to spent 😔`);
 });
 
 btnReset.addEventListener('click', function () {
   localStorage.removeItem('data');
+  expensesList.innerHTML = '';
+  emptyData.style.opacity = 1;
+  totalSpent = 0;
+  budgetLeft = 5000;
+  updateUI();
 });
 
 btnFilter.forEach(btn => {
