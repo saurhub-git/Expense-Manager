@@ -1,10 +1,4 @@
 'use strict';
-
-const totalBudget = 5000;
-let totalSpent = 0;
-let budgetLeft = 5000;
-let date;
-let savedData = [];
 // Element Selector
 
 const headerDate = document.querySelector('#currentDate');
@@ -20,21 +14,51 @@ const expensesList = document.querySelector('#expensesList');
 const btnReset = document.querySelector('.btn-reset');
 const btnFilter = document.querySelectorAll('.filter-btn');
 const btnDelete = document.querySelectorAll('.btn-delete');
-const emptyData = document.querySelector('.empty-state');
-// Setting deafault value
-totalBudgetEl.textContent = '₹' + totalBudget;
-headerDate.textContent = new Date().toLocaleDateString('en-IN', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  weekday: 'long',
-});
+const emptyList = document.querySelector('.empty-state');
 
-// Functions
+////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 
-const updateHTMLel = function (data) {
-  data.forEach((data, i) => {
-    const html = `<div class="expense-item">
+class App {
+  #totalBudget = 5000;
+  #totalSpent = 0;
+  #budgetLeft = 5000;
+  #date;
+  #savedData = [];
+  constructor() {
+    this._startupContent();
+    this._displayDate();
+    document.addEventListener(
+      'DOMContentLoaded',
+      this._previousDataLoading.bind(this)
+    );
+    btnExpense.addEventListener('submit', this._expenseCalculator.bind(this));
+    btnReset.addEventListener('click', this._resetAll.bind(this));
+    btnFilter.forEach(btn =>
+      btn.addEventListener('click', this._filter.bind(this))
+    );
+    expensesList.addEventListener('click', this._deleteExpense.bind(this));
+  }
+
+  _startupContent() {
+    totalBudgetEl.textContent = '₹' + this.#totalBudget;
+    headerDate.textContent = new Date().toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+    });
+  }
+
+  _displayDate() {
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    dateEl.value = formattedDate;
+  }
+
+  _updateExpenseList(data) {
+    data.forEach((data, i) => {
+      const html = `<div class="expense-item">
                 <div class="expense-details">
                 <div class="expense-amount">-₹${data.inputAmount}</div>
                 <div class="expense-category">${data.category}</div>
@@ -43,99 +67,103 @@ const updateHTMLel = function (data) {
               </div>
               <button class="btn btn-small btn-danger btn-delete" data-delete='${i}'>Delete</button>
             </div>`;
-    // expensesList.insertAdjacentHTML('beforeend', html);
-    expensesList.innerHTML += html;
-  });
-};
-
-const updateUI = function () {
-  totalSpentEl.textContent = '₹' + totalSpent;
-  budgetLeftEl.textContent = '₹' + budgetLeft;
-};
-
-document.addEventListener('DOMContentLoaded', function () {
-  const data = JSON.parse(localStorage.getItem('data'));
-  if (data) {
-    savedData = data;
-    expensesList.innerHTML = '';
-    savedData.forEach(data => {
-      totalSpent += +data.inputAmount;
-      budgetLeft -= +data.inputAmount;
+      expensesList.innerHTML += html;
     });
-    emptyData.style.opacity = 0;
+  }
 
-    updateHTMLel(savedData);
-    updateUI();
-  } else emptyData.style.opacity = 1;
-  const today = new Date();
+  _updateUI() {
+    totalSpentEl.textContent = '₹' + this.#totalSpent;
+    budgetLeftEl.textContent = '₹' + this.#budgetLeft;
+  }
 
-  // Format as yyyy-mm-dd (required for input[type="date"])
-  const formattedDate = today.toISOString().split('T')[0];
-  dateEl.value = formattedDate;
-});
+  _previousDataLoading() {
+    const data = JSON.parse(localStorage.getItem('data'));
+    if (data) {
+      this.#savedData = data;
+      expensesList.innerHTML = '';
+      this.#savedData.forEach(data => {
+        this.#totalSpent += +data.inputAmount;
+        this.#budgetLeft -= +data.inputAmount;
+      });
+      emptyList.style.opacity = 0;
 
-btnExpense.addEventListener('submit', function (e) {
-  e.preventDefault();
-  if (budgetLeft >= +inputAmount.value) {
-    budgetLeft -= +inputAmount.value;
-    totalSpent += +inputAmount.value;
-    date = new Date(new Date(dateEl.value)).toLocaleDateString();
+      this._updateExpenseList(this.#savedData);
+      this._updateUI();
+    } else emptyList.style.opacity = 1;
+  }
+
+  _expenseCalculator(e) {
+    e.preventDefault();
+    if (this.#budgetLeft >= +inputAmount.value) {
+      this.#budgetLeft -= +inputAmount.value;
+      this.#totalSpent += +inputAmount.value;
+      this.#date = new Date(new Date(dateEl.value)).toLocaleDateString();
+      expensesList.innerHTML = '';
+      this.#savedData.push({
+        date: this.#date,
+        category: inputCategory.value,
+        description: inputDescription.value,
+        inputAmount: inputAmount.value,
+      });
+
+      this._updateExpenseList(this.#savedData);
+      this._updateUI();
+      localStorage.setItem('data', JSON.stringify(this.#savedData));
+      inputAmount.value = inputCategory.value = inputDescription.value = '';
+      emptyList.style.opacity = 0;
+    } else alert(`You don't have enough budget to spent 😔`);
+  }
+
+  _resetAll() {
+    localStorage.removeItem('data');
+    this.#savedData = [];
     expensesList.innerHTML = '';
-    savedData.push({
-      date: date,
-      category: inputCategory.value,
-      description: inputDescription.value,
-      inputAmount: inputAmount.value,
-    });
+    emptyList.style.opacity = 1;
+    this.#totalSpent = 0;
+    this.#budgetLeft = 5000;
+    this._updateUI();
+  }
 
-    updateHTMLel(savedData);
-    updateUI();
-    localStorage.setItem('data', JSON.stringify(savedData));
-    inputAmount.value = inputCategory.value = inputDescription.value = '';
-    emptyData.style.opacity = 0;
-  } else alert(`You don't have enough budget to spent 😔`);
-});
-
-btnReset.addEventListener('click', function () {
-  localStorage.removeItem('data');
-  expensesList.innerHTML = '';
-  emptyData.style.opacity = 1;
-  totalSpent = 0;
-  budgetLeft = 5000;
-  updateUI();
-});
-
-btnFilter.forEach(btn => {
-  btn.addEventListener('click', function (e) {
+  _filter(e) {
     e.preventDefault();
     btnFilter.forEach(btn => btn.classList.remove('active'));
     e.target.classList.add('active');
     expensesList.innerHTML = '';
 
     if (e.target.dataset.filter !== 'all') {
-      const filter = savedData.filter(
+      const filter = this.#savedData.filter(
         data => data.category === e.target.dataset.filter
       );
-      console.log(filter);
-      updateHTMLel(filter);
-    } else {
-      updateHTMLel(savedData);
+      this._updateExpenseList(filter);
+    } else if (e.target.dataset.filter === 'all') {
+      this._updateExpenseList(this.#savedData);
     }
-  });
-});
+  }
 
-expensesList.addEventListener('click', function (e) {
-  e.preventDefault();
-  if (!e.target.classList.contains('btn-delete')) return;
-  totalSpent = 0;
-  budgetLeft = 5000;
-  expensesList.innerHTML = '';
-  savedData.splice(+e.target.dataset.delete, 1);
-  savedData.forEach(data => {
-    totalSpent += +data.inputAmount;
-    budgetLeft -= +data.inputAmount;
-  });
-  updateHTMLel(savedData);
-  updateUI();
-  localStorage.setItem('data', JSON.stringify(savedData));
-});
+  _deleteExpense(e) {
+    e.preventDefault();
+    if (!e.target.classList.contains('btn-delete')) return;
+    this.#totalSpent = 0;
+    this.#budgetLeft = 5000;
+    expensesList.innerHTML = '';
+    this.#savedData.splice(+e.target.dataset.delete, 1);
+    this.#savedData.forEach(data => {
+      this.#totalSpent += +data.inputAmount;
+      this.#budgetLeft -= +data.inputAmount;
+    });
+    this._updateExpenseList(this.#savedData);
+    this._updateUI();
+    localStorage.setItem('data', JSON.stringify(this.#savedData));
+  }
+
+  _changeBudget(value) {
+    this.#totalBudget += value;
+    this.#budgetLeft += value;
+    this._startupContent();
+    this._updateUI();
+  }
+}
+
+const app = new App();
+
+app._changeBudget(5000);
