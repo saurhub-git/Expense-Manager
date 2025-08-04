@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Expense Tracker</title>
+    <link href="style.css" rel="stylesheet" />
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>💰 My Expense Tracker</h1>
+        <div class="date" id="currentDate"></div>
+      </header>
+
+      <section class="stats-section">
+        <div class="stat-card budget">
+          <h3>Total Budget</h3>
+          <div class="amount" id="totalBudget">₹0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Total Spent</h3>
+          <div class="amount" id="totalSpent">₹0</div>
+        </div>
+        <div class="stat-card leftbudget">
+          <h3>Budget Left</h3>
+          <div class="amount" id="budgetLeft">₹5000</div>
+        </div>
+      </section>
+
+      <main class="main-content">
+        <section class="form-section">
+          <h2>Add New Expense</h2>
+          <form id="expenseForm">
+            <div class="form-group">
+              <label for="amount">Amount (₹)</label>
+              <input type="number" class="inputAmount" step="0.01" required />
+            </div>
+
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category" required>
+                <option value="">Select Category</option>
+                <option value="Food">🍕 Food</option>
+                <option value="Transport">🚗 Transport</option>
+                <option value="Entertainment">🎬 Entertainment</option>
+                <option value="Shopping">🛍️ Shopping</option>
+                <option value="Bills">💡 Bills</option>
+                <option value="Health">🏥 Health</option>
+                <option value="Other">📋 Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <input
+                type="text"
+                id="description"
+                placeholder="Brief description..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="date">Date</label>
+              <input type="date" id="date" required />
+            </div>
+
+            <button type="submit" class="btn">Add Expense</button>
+          </form>
+          <br />
+          <button class="btn btn-danger btn-reset">Reset</button>
+        </section>
+
+        <section class="expenses-section">
+          <h2>Recent Expenses</h2>
+
+          <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Food">Food</button>
+            <button class="filter-btn" data-filter="Transport">
+              Transport
+            </button>
+            <button class="filter-btn" data-filter="Entertainment">
+              Entertainment
+            </button>
+            <button class="filter-btn" data-filter="Shopping">Shopping</button>
+            <button class="filter-btn" data-filter="Bills">Bills</button>
+            <button class="filter-btn" data-filter="Other">Other</button>
+          </div>
+
+          <div class="expenses-list" id="expensesList">
+            <div class="expense-item">
+              <div class="expense-details">
+                <div class="expense-amount">-₹250</div>
+                <div class="expense-category">Food</div>
+                <div class="expense-description">test</div>
+                <div class="expense-date">3/8/25</div>
+              </div>
+              <button class="btn btn-small btn-danger">Delete</button>
+            </div>
+            <div class="empty-state">
+              No expenses yet. Add your first expense above! 🎯
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <footer class="footer">© Saurabh</footer>
+  </body>
+</html>
