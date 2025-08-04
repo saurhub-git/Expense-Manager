@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 btnExpense.addEventListener('submit', function (e) {
   e.preventDefault();
-  if (budgetLeft > +inputAmount.value) {
+  if (budgetLeft >= +inputAmount.value) {
     budgetLeft -= +inputAmount.value;
     totalSpent += +inputAmount.value;
     date = new Date(new Date(dateEl.value)).toLocaleDateString();
