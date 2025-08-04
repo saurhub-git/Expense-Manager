@@ -54,7 +54,6 @@ const updateUI = function () {
 
 document.addEventListener('DOMContentLoaded', function () {
   const data = JSON.parse(localStorage.getItem('data'));
-  console.log(data);
   if (data) {
     savedData = data;
     expensesList.innerHTML = '';
@@ -70,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Format as yyyy-mm-dd (required for input[type="date"])
   const formattedDate = today.toISOString().split('T')[0];
   dateEl.value = formattedDate;
-  console.log(localStorage.getItem('html'));
 });
 
 btnExpense.addEventListener('submit', function (e) {
@@ -90,7 +88,7 @@ btnExpense.addEventListener('submit', function (e) {
     updateHTMLel(savedData);
     updateUI();
     localStorage.setItem('data', JSON.stringify(savedData));
-    console.log(JSON.parse(localStorage.getItem('data')));
+    inputAmount.value = inputCategory.value = inputDescription.value = '';
   } else alert(`You don't have enough budget to spent 😔`);
 });
 
