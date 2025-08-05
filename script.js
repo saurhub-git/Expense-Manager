@@ -15,6 +15,7 @@ const btnReset = document.querySelector('.btn-reset');
 const btnFilter = document.querySelectorAll('.filter-btn');
 const btnDelete = document.querySelectorAll('.btn-delete');
 const emptyList = document.querySelector('.empty-state');
+const btnFilterAll = document.querySelector('.filter-btn-all');
 
 ////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
@@ -22,7 +23,7 @@ const emptyList = document.querySelector('.empty-state');
 class App {
   #totalBudget = 5000;
   #totalSpent = 0;
-  #budgetLeft = 5000;
+  #budgetLeft = this.#totalBudget;
   #date;
   #savedData = [];
   constructor() {
@@ -74,6 +75,7 @@ class App {
   _updateUI() {
     totalSpentEl.textContent = '₹' + this.#totalSpent;
     budgetLeftEl.textContent = '₹' + this.#budgetLeft;
+    if (this.#savedData.length === 0) emptyList.style.opacity = 1;
   }
 
   _previousDataLoading() {
@@ -111,6 +113,8 @@ class App {
       localStorage.setItem('data', JSON.stringify(this.#savedData));
       inputAmount.value = inputCategory.value = inputDescription.value = '';
       emptyList.style.opacity = 0;
+      btnFilter.forEach(btn => btn.classList.remove('active'));
+      btnFilterAll.classList.add('active');
     } else alert(`You don't have enough budget to spent 😔`);
   }
 
@@ -120,7 +124,7 @@ class App {
     expensesList.innerHTML = '';
     emptyList.style.opacity = 1;
     this.#totalSpent = 0;
-    this.#budgetLeft = 5000;
+    this.#budgetLeft = this.#totalBudget;
     this._updateUI();
   }
 
@@ -143,14 +147,10 @@ class App {
   _deleteExpense(e) {
     e.preventDefault();
     if (!e.target.classList.contains('btn-delete')) return;
-    this.#totalSpent = 0;
-    this.#budgetLeft = 5000;
+    this.#totalSpent -= +this.#savedData[e.target.dataset.delete].inputAmount;
+    this.#budgetLeft += +this.#savedData[e.target.dataset.delete].inputAmount;
     expensesList.innerHTML = '';
     this.#savedData.splice(+e.target.dataset.delete, 1);
-    this.#savedData.forEach(data => {
-      this.#totalSpent += +data.inputAmount;
-      this.#budgetLeft -= +data.inputAmount;
-    });
     this._updateExpenseList(this.#savedData);
     this._updateUI();
     localStorage.setItem('data', JSON.stringify(this.#savedData));
