@@ -76,10 +76,10 @@ header h1 {
   color: #27ae60;
 }
 .stat-card.leftbudget .amount {
-  color: red;
+  color: black;
 }
 
-.stat-card.warning .amount {
+.stat-card #totalSpent {
   color: #e74c3c;
 }
 
@@ -205,6 +205,12 @@ header h1 {
   color: #e74c3c;
 }
 
+.income-amount {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+
 .expense-category {
   background: #3498db;
   color: white;
@@ -227,6 +233,12 @@ header h1 {
 
 .expense-actions {
   display: flex;
+  gap: 10px;
+}
+
+.control-btns {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -265,5 +277,10 @@ header h1 {
 
   header h1 {
     font-size: 2rem;
+  }
+
+  .control-btns {
+    flex-direction: row;
+    justify-content: center;
   }
 }
