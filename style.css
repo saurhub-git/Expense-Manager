@@ -242,6 +242,10 @@ header h1 {
   gap: 10px;
 }
 
+.btn-submit {
+  text-transform: capitalize;
+}
+
 .btn-small {
   padding: 6px 12px;
   font-size: 0.8rem;

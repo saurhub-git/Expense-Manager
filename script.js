@@ -12,6 +12,7 @@ const inputCategory = document.querySelector('#category');
 const inputDescription = document.querySelector('#description');
 const dateEl = document.querySelector('#date');
 const expensesList = document.querySelector('#expensesList');
+const btnSubmit = document.querySelector('.btn-submit');
 const btnReset = document.querySelector('.btn-reset');
 const btnFilter = document.querySelectorAll('.filter-btn');
 const btnDelete = document.querySelectorAll('.btn-delete');
@@ -139,6 +140,9 @@ class App {
         option.text = item.text;
         inputCategory.appendChild(option);
       });
+    }
+    if (this.value !== '') {
+      btnSubmit.textContent = `Add ${this.value}`;
     }
   }
 
