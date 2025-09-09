@@ -19,6 +19,24 @@ const btnDelete = document.querySelectorAll('.btn-delete');
 const emptyList = document.querySelector('.empty-state');
 const btnFilterAll = document.querySelector('.filter-btn-all');
 
+const localeCurrencyMap = {
+  'en-US': 'USD',
+  'en-GB': 'GBP',
+  'en-CA': 'CAD',
+  'en-AU': 'AUD',
+  'en-IN': 'INR',
+  'de-DE': 'EUR',
+  'fr-FR': 'EUR',
+  'ja-JP': 'JPY',
+  'zh-CN': 'CNY',
+  'ko-KR': 'KRW',
+  'ru-RU': 'RUB',
+  'pt-BR': 'BRL',
+  'es-ES': 'EUR',
+  'it-IT': 'EUR',
+  'nl-NL': 'EUR',
+};
+
 const categoryData = {
   income: [
     { value: 'Salary', text: '💸 Salary' },
@@ -26,9 +44,10 @@ const categoryData = {
   ],
   expense: [
     { value: 'Food', text: '🍕 Food' },
+    { value: 'Grocery', text: '🛒 Grocery' },
     { value: 'Transport', text: '🚗 Transport' },
     { value: 'Entertainment', text: '🎬 Entertainment' },
-    { value: 'Shopping', text: '🛍️ Shopping' },
+    { value: 'Shopping', text: '💳 Shopping' },
     { value: 'Bills', text: '💡 Bills' },
     { value: 'Health', text: '🏥 Health' },
     { value: 'Other', text: '📋 Other' },
@@ -40,6 +59,7 @@ const categoryData = {
 
 class App {
   transactionType;
+  #currency = localeCurrencyMap[navigator.language] || 'INR';
   #totalBudget = 0;
   #totalSpent = 0;
   #budgetLeft = this.#totalBudget;
@@ -62,7 +82,7 @@ class App {
   }
 
   _startupContent() {
-    totalBudgetEl.textContent = '₹' + this.#totalBudget;
+    totalBudgetEl.textContent = this._formatCurrency(this.#totalBudget);
     headerDate.textContent = new Date().toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'long',
@@ -77,14 +97,25 @@ class App {
     dateEl.value = formattedDate;
   }
 
+  // Formatting numbers and currency
+
+  _formatCurrency(num) {
+    return new Intl.NumberFormat(navigator.language, {
+      style: 'currency',
+      currency: this.#currency,
+      minimumFractionDigits: num % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: num % 1 === 0 ? 0 : 2,
+    }).format(num);
+  }
+
   _updateExpenseList(data) {
     data.forEach((data, i) => {
       const html = `<div class="expense-item">
                 <div class="expense-details">
                 <div class="${data.transactionType}-amount">${
         data.transactionType === 'expense'
-          ? '-₹' + data.inputAmount
-          : '+₹' + data.inputAmount
+          ? '-' + this._formatCurrency(data.inputAmount)
+          : '+' + this._formatCurrency(data.inputAmount)
       }</div>
                 <div class="expense-category">${data.category}</div>
                 <div class="expense-description">${data.description}</div>
@@ -97,15 +128,14 @@ class App {
   }
 
   _updateUI() {
-    totalBudgetEl.textContent = '₹' + this.#totalBudget;
-    totalSpentEl.textContent = '₹' + this.#totalSpent;
-    budgetLeftEl.textContent = '₹' + this.#budgetLeft;
+    totalBudgetEl.textContent = this._formatCurrency(this.#totalBudget);
+    totalSpentEl.textContent = this._formatCurrency(this.#totalSpent);
+    budgetLeftEl.textContent = this._formatCurrency(this.#budgetLeft);
     if (this.#savedData.length === 0) emptyList.style.opacity = 1;
   }
 
   _previousDataLoading() {
     const data = JSON.parse(localStorage.getItem('data'));
-    console.log(data);
 
     if (data) {
       this.#savedData = data;
@@ -162,7 +192,6 @@ class App {
       this.#totalSpent += +inputAmount.value;
       this.transactionType = 'expense';
     } else if (inputTransactionType.value === 'income') {
-      console.log('income');
       this.#totalBudget += +inputAmount.value;
       this.#budgetLeft += +inputAmount.value;
       this.transactionType = 'income';
@@ -174,10 +203,9 @@ class App {
       date: this.#date,
       category: inputCategory.value,
       description: inputDescription.value,
-      inputAmount: inputAmount.value,
+      inputAmount: +inputAmount.value,
       transactionType: this.transactionType,
     });
-    console.log(this.#savedData);
     this._updateExpenseList(this.#savedData);
     this._updateUI();
     localStorage.setItem('data', JSON.stringify(this.#savedData));
@@ -189,7 +217,6 @@ class App {
     emptyList.style.opacity = 0;
     btnFilter.forEach(btn => btn.classList.remove('active'));
     btnFilterAll.classList.add('active');
-    console.log(this.#savedData);
   }
 
   _resetAll() {
