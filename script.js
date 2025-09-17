@@ -180,7 +180,7 @@ class App {
 
   _expenseCalculator(e) {
     e.preventDefault();
-    if (inputAmount.value === "0") {
+    if (+inputAmount.value === 0) {
       inputAmount.value =
         inputTransactionType.value =
         inputCategory.value =
