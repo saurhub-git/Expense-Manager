@@ -191,14 +191,16 @@ class App {
 
   _expenseCalculator(e) {
     e.preventDefault();
-    if (+inputAmount.value === 0) {
+    if (+inputAmount.value <= 0) {
       inputAmount.value =
         inputTransactionType.value =
         inputCategory.value =
         inputDescription.value =
           "";
       inputAmount.focus();
-      return alert("Income/Expense cannot be 0. Please Enter a valid value.");
+      return alert(
+        "Income/Expense cannot be less than 1. Please Enter a valid value."
+      );
     }
     if (inputTransactionType.value === "expense") {
       this.#budgetLeft -= +inputAmount.value;
