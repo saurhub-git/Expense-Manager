@@ -121,7 +121,9 @@ class App {
                 <div class="expense-description">${data.description}</div>
                 <div class="expense-date">${data.date}</div>
               </div>
-              <button class="btn btn-small btn-danger btn-delete" data-delete='${i}'>Delete</button>
+              <button class="btn btn-small btn-danger btn-delete" data-id='${
+                data.id
+              }'>Delete</button>
             </div>`;
       expensesList.innerHTML += html;
     });
@@ -205,6 +207,7 @@ class App {
       description: inputDescription.value,
       inputAmount: +inputAmount.value,
       transactionType: this.transactionType,
+      id: Date.now(),
     });
     this._updateExpenseList(this.#savedData);
     this._updateUI();
@@ -253,7 +256,10 @@ class App {
   _deleteExpense(e) {
     e.preventDefault();
     if (!e.target.classList.contains("btn-delete")) return;
-    const dataset = this.#savedData[e.target.dataset.delete];
+    const currentDataIndex = this.#savedData.filter(
+      (data) => data.id === +e.target.dataset.id
+    );
+    const [dataset] = currentDataIndex;
     if (dataset.transactionType === "expense") {
       this.#totalSpent -= +dataset.inputAmount;
       this.#budgetLeft += +dataset.inputAmount;
@@ -264,7 +270,11 @@ class App {
     }
 
     expensesList.innerHTML = "";
-    this.#savedData.splice(+e.target.dataset.delete, 1);
+    this.#savedData = this.#savedData.filter(
+      (data) => data.id !== +e.target.dataset.id
+    );
+    btnFilter.forEach((btn) => btn.classList.remove("active"));
+    btnFilterAll.classList.add("active");
     this._updateExpenseList(this.#savedData);
     this._updateUI();
     localStorage.setItem("data", JSON.stringify(this.#savedData));
