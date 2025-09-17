@@ -133,7 +133,7 @@ class App {
     totalBudgetEl.textContent = this._formatCurrency(this.#totalBudget);
     totalSpentEl.textContent = this._formatCurrency(this.#totalSpent);
     budgetLeftEl.textContent = this._formatCurrency(this.#budgetLeft);
-    if (this.#savedData.length === 0) emptyList.style.opacity = 1;
+    if (this.#savedData.length === 0) emptyList.style.display = "block";
   }
 
   _previousDataLoading() {
@@ -152,11 +152,11 @@ class App {
           this.#budgetLeft += +data.inputAmount;
         }
       });
-      emptyList.style.opacity = 0;
+      emptyList.style.display = "none";
 
       this._updateExpenseList(this.#savedData);
       this._updateUI();
-    } else emptyList.style.opacity = 1;
+    } else emptyList.style.display = "block";
   }
 
   // Changing cateogry according to Transaction Type
@@ -217,7 +217,7 @@ class App {
       inputCategory.value =
       inputDescription.value =
         "";
-    emptyList.style.opacity = 0;
+    emptyList.style.display = "none";
     btnFilter.forEach((btn) => btn.classList.remove("active"));
     btnFilterAll.classList.add("active");
   }
@@ -230,7 +230,7 @@ class App {
     localStorage.removeItem("data");
     this.#savedData = [];
     expensesList.innerHTML = "";
-    emptyList.style.opacity = 1;
+    emptyList.style.display = "block";
     this.#totalSpent = 0;
     this.#totalBudget = 0;
     this.#budgetLeft = this.#totalBudget;
@@ -242,14 +242,19 @@ class App {
     btnFilter.forEach((btn) => btn.classList.remove("active"));
     e.target.classList.add("active");
     expensesList.innerHTML = "";
-
+    let filter;
     if (e.target.dataset.filter !== "all") {
-      const filter = this.#savedData.filter(
+      filter = this.#savedData.filter(
         (data) => data.category === e.target.dataset.filter
       );
-      this._updateExpenseList(filter);
     } else if (e.target.dataset.filter === "all") {
-      this._updateExpenseList(this.#savedData);
+      filter = this.#savedData;
+    }
+    if (filter.length < 1) {
+      emptyList.style.display = "block";
+    } else {
+      this._updateExpenseList(filter);
+      emptyList.style.display = "none";
     }
   }
 
