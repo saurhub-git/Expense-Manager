@@ -54,6 +54,15 @@ const categoryData = {
   ],
 };
 
+const escapeHTML = (value = "") =>
+  String(value).replace(
+    /[&<>"']/g,
+    (ch) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[
+        ch
+      ])
+  );
+
 ////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 
@@ -109,7 +118,7 @@ class App {
   }
 
   _updateExpenseList(data) {
-    data.forEach((data, i) => {
+    data.forEach((data) => {
       const html = `<div class="expense-item">
                 <div class="expense-details">
                 <div class="${data.transactionType}-amount">${
@@ -118,7 +127,9 @@ class App {
           : "+" + this._formatCurrency(data.inputAmount)
       }</div>
                 <div class="expense-category">${data.category}</div>
-                <div class="expense-description">${data.description}</div>
+                <div class="expense-description">${escapeHTML(
+                  data.description
+                )}</div>
                 <div class="expense-date">${data.date}</div>
               </div>
               <button class="btn btn-small btn-danger btn-delete" data-id='${
